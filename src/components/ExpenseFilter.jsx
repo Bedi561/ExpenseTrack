@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useRecoilState } from 'recoil';
-import { filterState } from '@/lib/recoil/atoms';
+import { filterState } from '../lib/recoil/atoms';
 import { motion } from 'framer-motion';
 
 const categories = [

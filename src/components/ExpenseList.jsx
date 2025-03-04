@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
-import { expensesState, filterState, loadingState } from '@/lib/recoil/atoms';
+import { expensesState, filterState, loadingState } from '../lib/recoil/atoms';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { expensesState, filterState } from '@/lib/recoil/atoms';
+import { expensesState, filterState } from '../lib/recoil/atoms';
 import { motion } from 'framer-motion';
 
 const ExpenseSummary = () => {

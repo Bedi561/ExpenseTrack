@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { useSetRecoilState, useRecoilState } from 'recoil';
-import { expensesState, loadingState } from '@/lib/recoil/atoms';
-import { addExpense } from '@/lib/api';
+import { expensesState, loadingState } from '../lib/recoil/atoms';
+import { addExpense } from '../lib/api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
