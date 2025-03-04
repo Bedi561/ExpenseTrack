@@ -3,100 +3,100 @@ const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
 
-// GET /expenses - Get all expenses (with optional filters)
+// Get all expenses with optional filters
 router.get('/', async (req, res) => {
   try {
-    const { category, date, startDate, endDate } = req.query;
-    
-    // Build filter query
-    const filter = {};
+    const { category, date } = req.query;
+    let query = {};
     
     if (category) {
-      filter.category = category;
+      query.category = category;
     }
     
     if (date) {
-      // Filter by specific date
       const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
       
-      filter.date = { $gte: startOfDay, $lte: endOfDay };
-    } else if (startDate || endDate) {
-      // Filter by date range
-      filter.date = {};
-      
-      if (startDate) {
-        filter.date.$gte = new Date(startDate);
-      }
-      
-      if (endDate) {
-        const endOfDay = new Date(endDate);
-        endOfDay.setHours(23, 59, 59, 999);
-        filter.date.$lte = endOfDay;
-      }
+      query.date = { $gte: startOfDay, $lte: endOfDay };
     }
     
-    const expenses = await Expense.find(filter).sort({ date: -1 });
-    res.json(expenses);
+    const expenses = await Expense.find(query).sort({ date: -1 });
+    
+    // Format response for frontend
+    const formattedExpenses = expenses.map(expense => ({
+      id: expense._id,
+      amount: expense.amount,
+      category: expense.category,
+      date: expense.date.toISOString().split('T')[0],
+      description: expense.description
+    }));
+    
+    res.json(formattedExpenses);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching expenses:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// GET /expenses/total - Get total expenses for a date range
-router.get('/total', async (req, res) => {
-  try {
-    const { start, end } = req.query;
-    
-    const filter = {};
-    
-    if (start || end) {
-      filter.date = {};
-      
-      if (start) {
-        filter.date.$gte = new Date(start);
-      }
-      
-      if (end) {
-        const endOfDay = new Date(end);
-        endOfDay.setHours(23, 59, 59, 999);
-        filter.date.$lte = endOfDay;
-      }
-    }
-    
-    const expenses = await Expense.find(filter);
-    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    
-    res.json({ total });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// POST /expenses - Add a new expense
+// Add new expense
 router.post('/', async (req, res) => {
   try {
     const { amount, category, date, description } = req.body;
     
-    // Simple validation
-    if (!amount || !category || !date) {
-      return res.status(400).json({ message: 'Please provide amount, category, and date' });
-    }
-    
     const newExpense = new Expense({
       amount,
       category,
-      date,
-      description: description || '',
+      date: new Date(date),
+      description
     });
     
     const savedExpense = await newExpense.save();
-    res.status(201).json(savedExpense);
+    
+    // Format response for frontend
+    res.status(201).json({
+      id: savedExpense._id,
+      amount: savedExpense.amount,
+      category: savedExpense.category,
+      date: savedExpense.date.toISOString().split('T')[0],
+      description: savedExpense.description
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Error adding expense:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get total expenses for a date range
+router.get('/total', async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    let query = {};
+    
+    if (start || end) {
+      query.date = {};
+      
+      if (start) {
+        const startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
+        query.date.$gte = startDate;
+      }
+      
+      if (end) {
+        const endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
+        query.date.$lte = endDate;
+      }
+    }
+    
+    const expenses = await Expense.find(query);
+    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    
+    res.json({ total });
+  } catch (error) {
+    console.error('Error calculating total expenses:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
