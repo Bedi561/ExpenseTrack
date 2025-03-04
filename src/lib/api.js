@@ -1,5 +1,5 @@
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://expensetrack-d1v1.onrender.com';
 
 export async function fetchExpenses(filter = {}) {
   const params = new URLSearchParams();
