@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSetRecoilState, useRecoilState } from 'recoil';
 import { expensesState, loadingState } from '../lib/recoil/atoms';
@@ -6,6 +5,8 @@ import { addExpense } from '../lib/api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
+// ye categories array hai jisme sare expense types store hai
+// user inme se koi ek select kr skta hai
 const categories = [
   'Food', 
   'Transportation', 
@@ -18,39 +19,49 @@ const categories = [
 ];
 
 const ExpenseForm = () => {
+  // form ka data store krne k liye useState use kr rhe hai
+  // initial values empty rakhi hai except date jo aaj ki date hogi
   const [expense, setExpense] = useState({
     amount: '',
     category: '',
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0], // aaj ki date by default
     description: '',
   });
   
+  // recoil se state management kr rhe hai
   const setExpenses = useSetRecoilState(expensesState);
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
 
+  // jab bhi koi input field me change hoga to ye function call hoga
+  // destructuring use krke name aur value nikal rhe hai
   const handleChange = (e) => {
     const { name, value } = e.target;
     setExpense(prev => ({ ...prev, [name]: value }));
   };
 
+  // form submit krne pe ye function chalega
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // page refresh nhi hoga
     
+    // check kr rhe hai ki required fields bhare hai ya nhi
     if (!expense.amount || !expense.category || !expense.date) {
       toast.error('Please fill in all required fields');
       return;
     }
     
     try {
-      setIsLoading(true);
+      setIsLoading(true); // loading start
+      
+      // backend me data bhej rhe hai
       const newExpense = await addExpense({
         ...expense,
-        amount: parseFloat(expense.amount),
+        amount: parseFloat(expense.amount), // string se number me convert kr rhe
       });
       
+      // naya expense add kr rhe hai state me
       setExpenses(prev => [...prev, newExpense]);
       
-      // Reset form
+      // form ko reset kr rhe hai - sare fields empty kr denge
       setExpense({
         amount: '',
         category: '',
@@ -58,25 +69,30 @@ const ExpenseForm = () => {
         description: '',
       });
       
+      // success msg dikhayenge
       toast.success('Expense added successfully');
     } catch (error) {
+      // agar koi error aaya to error msg dikhayenge
       toast.error('Failed to add expense');
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // loading khatam
     }
   };
 
   return (
+    // framer-motion se animation add ki hai
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="w-full max-w-md mx-auto bg-white rounded-xl shadow-sm p-6 mb-8"
     >
+      {/* form ka main container */}
       <h2 className="text-xl font-medium mb-4 text-center">Add New Expense</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Amount input - number type hai, decimal values allow krta hai */}
         <div>
           <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
             Amount *
@@ -94,6 +110,7 @@ const ExpenseForm = () => {
           />
         </div>
         
+        {/* Category dropdown - upar wale categories array se options generate hote hai */}
         <div>
           <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
             Category *
@@ -113,6 +130,7 @@ const ExpenseForm = () => {
           </select>
         </div>
         
+        {/* Date input - type="date" se calendar popup milta hai */}
         <div>
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
             Date *
@@ -128,6 +146,7 @@ const ExpenseForm = () => {
           />
         </div>
         
+        {/* Description textarea - optional field hai */}
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
@@ -143,6 +162,7 @@ const ExpenseForm = () => {
           />
         </div>
         
+        {/* Submit button - loading k time pe disabled ho jata hai */}
         <button
           type="submit"
           disabled={isLoading}

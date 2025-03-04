@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { expensesState, filterState, loadingState } from '../lib/recoil/atoms';
@@ -6,23 +5,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
 const ExpenseList = () => {
+  // recoil se data fetch kr rhe hai
   const expenses = useRecoilValue(expensesState);
   const filter = useRecoilValue(filterState);
   const [isLoading] = useRecoilState(loadingState);
+  
+  // filtered expenses ko track krne k liye local state
   const [filteredExpenses, setFilteredExpenses] = useState(expenses);
 
+  // jab bhi expenses ya filters change honge, filtering logic chalegi
   useEffect(() => {
-    // Apply filters
+    // sabse pehle original expenses ka copy banaya
     let result = [...expenses];
     
+    // category filter lagaya - agar selected hai to
     if (filter.category) {
       result = result.filter(expense => expense.category === filter.category);
     }
     
+    // start date se filter kiya - purane expenses hatane k liye
     if (filter.startDate) {
       result = result.filter(expense => new Date(expense.date) >= new Date(filter.startDate));
     }
     
+    // end date se filter kiya - new expenses hatane k liye
     if (filter.endDate) {
       result = result.filter(expense => new Date(expense.date) <= new Date(filter.endDate));
     }
@@ -30,6 +36,7 @@ const ExpenseList = () => {
     setFilteredExpenses(result);
   }, [expenses, filter]);
 
+  // paise ko USD format me convert krne k liye helper function
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -38,6 +45,7 @@ const ExpenseList = () => {
   };
 
   return (
+    // main container with animation
     <div className="w-full">
       <motion.div 
         initial={{ opacity: 0 }}

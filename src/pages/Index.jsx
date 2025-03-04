@@ -1,10 +1,10 @@
-
 import React, { useEffect } from 'react';
 import { useSetRecoilState, useRecoilState } from 'recoil';
 import { expensesState, loadingState } from '../lib/recoil/atoms';
 import { fetchExpenses } from '../lib/api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import "../index.css";
 
 import ExpenseForm from '@/components/ExpenseForm';
 import ExpenseList from '@/components/ExpenseList';
@@ -24,7 +24,7 @@ const Index = () => {
       } catch (error) {
         console.error('Failed to load expenses:', error);
         toast.error('Failed to load expenses. Using sample data instead.');
-        
+
         // Fallback to sample data if API is not available
         setExpenses([
           {
@@ -65,27 +65,31 @@ const Index = () => {
   }, [setExpenses, setIsLoading]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background p-4">
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="py-8 text-center"
+        className="py-4 text-center"
       >
-        <h1 className="text-3xl font-bold tracking-tight">Expense Tracker</h1>
-        <p className="text-muted-foreground mt-2">Keep track of your spending habits</p>
+        <h1 className="text-2xl font-bold tracking-tight">Expense Tracker</h1>
+        <p className="text-muted-foreground text-sm">Keep track of your spending habits</p>
       </motion.header>
 
-      <main className="container px-4 pb-16 max-w-5xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-8">
-            <ExpenseForm />
+      <main className="container mx-auto max-w-[1400px]">
+        <div className="grid grid-cols-12 gap-4">
+          {/* Left Column */}
+          <div className="col-span-3 space-y-4">
             <ExpenseSummary />
+            <ExpenseForm />
           </div>
-          
-          <div className="lg:col-span-2 space-y-8">
-            <ExpenseFilter />
-            <ExpenseList />
+
+          {/* Right Column */}
+          <div className="col-span-9 space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <ExpenseFilter />
+              <ExpenseList />
+            </div>
           </div>
         </div>
       </main>

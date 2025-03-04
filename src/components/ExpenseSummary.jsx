@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { expensesState, filterState } from '../lib/recoil/atoms';
@@ -11,7 +10,6 @@ const ExpenseSummary = () => {
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
-    // Apply filters
     let result = [...expenses];
     
     if (filter.category) {
@@ -28,7 +26,6 @@ const ExpenseSummary = () => {
     
     setFilteredExpenses(result);
     
-    // Calculate total
     const total = result.reduce((sum, expense) => sum + expense.amount, 0);
     setTotalAmount(total);
   }, [expenses, filter]);

@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import { filterState } from '../lib/recoil/atoms';
 import { motion } from 'framer-motion';
 
+// ye sare categories hai jo user select kr skta hai expense k liye
 const categories = [
   'All',
   'Food', 
@@ -17,13 +17,17 @@ const categories = [
 ];
 
 const ExpenseFilter = () => {
+  // recoil se state management kr rhe hai, filter ka data store krne k liye
   const [filter, setFilter] = useRecoilState(filterState);
 
+  // normal date inputs k liye handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilter(prev => ({ ...prev, [name]: value }));
   };
 
+  // category button click krne pe ye function call hoga
+  // All select krne pe empty string set hogi, wrna jo category click ki wo set hogi
   const handleCategoryChange = (category) => {
     setFilter(prev => ({ 
       ...prev, 
@@ -31,6 +35,7 @@ const ExpenseFilter = () => {
     }));
   };
 
+  // Reset button click krne pe sare filters clear ho jayenge
   const resetFilters = () => {
     setFilter({
       category: '',
@@ -40,13 +45,15 @@ const ExpenseFilter = () => {
   };
 
   return (
+    // framer-motion se smooth animation add ki hai jab component load hota hai
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="bg-white rounded-xl shadow-sm p-6 mb-8"
     >
-      <div className="flex items-center justify-between mb-4">
+      {/* filter section ka main container */}
+      <div className="flex items-center justify-between mb-4 ">
         <h2 className="text-xl font-medium">Filter Expenses</h2>
         
         <button 
@@ -57,7 +64,9 @@ const ExpenseFilter = () => {
         </button>
       </div>
 
+      {/* 2 columns me divide kiya hai - date aur category k liye */}
       <div className="grid gap-6 md:grid-cols-2">
+        {/* date wala section - start date aur end date k inputs */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700">
             Date Range
@@ -88,6 +97,7 @@ const ExpenseFilter = () => {
           </div>
         </div>
         
+        {/* category buttons ka section - map krke sare categories show kr rhe */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700">
             Category
